@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   detectSiteMode,
   detectSiteModeFromUrl,
-  getClawdHubSiteUrl,
+  getSkillsSiteUrl,
   getOnlyCrabsHost,
   getOnlyCrabsSiteUrl,
   getSiteDescription,
@@ -42,9 +42,9 @@ afterEach(() => {
 
 describe('site helpers', () => {
   it('returns default and env configured site URLs', () => {
-    expect(getClawdHubSiteUrl()).toBe('https://clawdhub.com')
+    expect(getSkillsSiteUrl()).toBe('https://skills.com')
     withMetaEnv({ VITE_SITE_URL: 'https://example.com' }, () => {
-      expect(getClawdHubSiteUrl()).toBe('https://example.com')
+      expect(getSkillsSiteUrl()).toBe('https://example.com')
     })
   })
 
@@ -79,11 +79,11 @@ describe('site helpers', () => {
       expect(getOnlyCrabsHost()).toBe('souls.example.com')
       expect(detectSiteMode('souls.example.com')).toBe('souls')
       expect(detectSiteMode('sub.souls.example.com')).toBe('souls')
-      expect(detectSiteMode('clawdhub.com')).toBe('skills')
+      expect(detectSiteMode('skills.com')).toBe('skills')
 
       expect(detectSiteModeFromUrl('https://souls.example.com/x')).toBe('souls')
       expect(detectSiteModeFromUrl('souls.example.com')).toBe('souls')
-      expect(detectSiteModeFromUrl('https://clawdhub.com')).toBe('skills')
+      expect(detectSiteModeFromUrl('https://skills.com')).toBe('skills')
     })
   })
 
@@ -118,13 +118,13 @@ describe('site helpers', () => {
   })
 
   it('derives site metadata from mode', () => {
-    expect(getSiteName('skills')).toBe('ClawdHub')
+    expect(getSiteName('skills')).toBe('Skills')
     expect(getSiteName('souls')).toBe('SoulHub')
 
-    expect(getSiteDescription('skills')).toContain('ClawdHub')
+    expect(getSiteDescription('skills')).toContain('Skills')
     expect(getSiteDescription('souls')).toContain('SoulHub')
 
-    expect(getSiteUrlForMode('skills')).toBe('https://clawdhub.com')
+    expect(getSiteUrlForMode('skills')).toBe('https://skills.com')
     expect(getSiteUrlForMode('souls')).toBe('https://onlycrabs.ai')
   })
 })

@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { resolveClawdbotDefaultWorkspace, resolveClawdbotSkillRoots } from './clawdbotConfig.js'
+import { resolveBotDefaultWorkspace, resolveBotSkillRoots } from './botConfig.js'
 
 const originalEnv = { ...process.env }
 
@@ -11,32 +11,32 @@ afterEach(() => {
   process.env = { ...originalEnv }
 })
 
-describe('resolveClawdbotSkillRoots', () => {
+describe('resolveBotSkillRoots', () => {
   it('reads JSON5 config and resolves per-agent + shared skill roots', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'clawdhub-clawdbot-'))
+    const base = await mkdtemp(join(tmpdir(), 'skills-bot-'))
     const home = join(base, 'home')
     const stateDir = join(base, 'state')
-    const configPath = join(base, 'clawdbot.json')
+    const configPath = join(base, 'bot.json')
 
     process.env.HOME = home
-    process.env.CLAWDBOT_STATE_DIR = stateDir
-    process.env.CLAWDBOT_CONFIG_PATH = configPath
+    process.env.BOT_STATE_DIR = stateDir
+    process.env.BOT_CONFIG_PATH = configPath
 
     const config = `{
       // JSON5 comments + trailing commas supported
       agents: {
-        defaults: { workspace: '~/clawd-main', },
+        defaults: { workspace: '~/bot-main', },
         list: [
-          { id: 'work', name: 'Work Bot', workspace: '~/clawd-work', },
-          { id: 'family', workspace: '~/clawd-family', },
+          { id: 'work', name: 'Work Bot', workspace: '~/bot-work', },
+          { id: 'family', workspace: '~/bot-family', },
         ],
       },
       // legacy entries still supported
-      agent: { workspace: '~/clawd-legacy', },
+      agent: { workspace: '~/bot-legacy', },
       routing: {
         agents: {
-          work: { name: 'Work Bot', workspace: '~/clawd-work', },
-          family: { workspace: '~/clawd-family' },
+          work: { name: 'Work Bot', workspace: '~/bot-work', },
+          family: { workspace: '~/bot-family' },
         },
       },
       skills: {
@@ -45,37 +45,37 @@ describe('resolveClawdbotSkillRoots', () => {
     }`
     await writeFile(configPath, config, 'utf8')
 
-    const { roots, labels } = await resolveClawdbotSkillRoots()
+    const { roots, labels } = await resolveBotSkillRoots()
 
     const expectedRoots = [
       resolve(stateDir, 'skills'),
-      resolve(home, 'clawd-main', 'skills'),
-      resolve(home, 'clawd-work', 'skills'),
-      resolve(home, 'clawd-family', 'skills'),
+      resolve(home, 'bot-main', 'skills'),
+      resolve(home, 'bot-work', 'skills'),
+      resolve(home, 'bot-family', 'skills'),
       resolve(home, 'shared', 'skills'),
       resolve('/opt/skills'),
     ]
 
     expect(roots).toEqual(expect.arrayContaining(expectedRoots))
     expect(labels[resolve(stateDir, 'skills')]).toBe('Shared skills')
-    expect(labels[resolve(home, 'clawd-main', 'skills')]).toBe('Agent: main')
-    expect(labels[resolve(home, 'clawd-work', 'skills')]).toBe('Agent: Work Bot')
-    expect(labels[resolve(home, 'clawd-family', 'skills')]).toBe('Agent: family')
+    expect(labels[resolve(home, 'bot-main', 'skills')]).toBe('Agent: main')
+    expect(labels[resolve(home, 'bot-work', 'skills')]).toBe('Agent: Work Bot')
+    expect(labels[resolve(home, 'bot-family', 'skills')]).toBe('Agent: family')
     expect(labels[resolve(home, 'shared', 'skills')]).toBe('Extra: skills')
     expect(labels[resolve('/opt/skills')]).toBe('Extra: skills')
   })
 
   it('resolves default workspace from agents.defaults and agents.list', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'clawdhub-clawdbot-default-'))
+    const base = await mkdtemp(join(tmpdir(), 'skills-bot-default-'))
     const home = join(base, 'home')
     const stateDir = join(base, 'state')
-    const configPath = join(base, 'clawdbot.json')
+    const configPath = join(base, 'bot.json')
     const workspaceMain = join(base, 'workspace-main')
     const workspaceList = join(base, 'workspace-list')
 
     process.env.HOME = home
-    process.env.CLAWDBOT_STATE_DIR = stateDir
-    process.env.CLAWDBOT_CONFIG_PATH = configPath
+    process.env.BOT_STATE_DIR = stateDir
+    process.env.BOT_CONFIG_PATH = configPath
 
     const config = `{
       agents: {
@@ -87,19 +87,19 @@ describe('resolveClawdbotSkillRoots', () => {
     }`
     await writeFile(configPath, config, 'utf8')
 
-    const workspace = await resolveClawdbotDefaultWorkspace()
+    const workspace = await resolveBotDefaultWorkspace()
     expect(workspace).toBe(resolve(workspaceMain))
   })
 
   it('falls back to default agent in agents.list when defaults missing', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'clawdhub-clawdbot-list-'))
+    const base = await mkdtemp(join(tmpdir(), 'skills-bot-list-'))
     const home = join(base, 'home')
-    const configPath = join(base, 'clawdbot.json')
+    const configPath = join(base, 'bot.json')
     const workspaceMain = join(base, 'workspace-main')
     const workspaceWork = join(base, 'workspace-work')
 
     process.env.HOME = home
-    process.env.CLAWDBOT_CONFIG_PATH = configPath
+    process.env.BOT_CONFIG_PATH = configPath
 
     const config = `{
       agents: {
@@ -111,19 +111,19 @@ describe('resolveClawdbotSkillRoots', () => {
     }`
     await writeFile(configPath, config, 'utf8')
 
-    const workspace = await resolveClawdbotDefaultWorkspace()
+    const workspace = await resolveBotDefaultWorkspace()
     expect(workspace).toBe(resolve(workspaceMain))
   })
 
-  it('respects CLAWDBOT_STATE_DIR and CLAWDBOT_CONFIG_PATH overrides', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'clawdhub-clawdbot-override-'))
+  it('respects BOT_STATE_DIR and BOT_CONFIG_PATH overrides', async () => {
+    const base = await mkdtemp(join(tmpdir(), 'skills-bot-override-'))
     const home = join(base, 'home')
     const stateDir = join(base, 'custom-state')
-    const configPath = join(base, 'config', 'clawdbot.json')
+    const configPath = join(base, 'config', 'bot.json')
 
     process.env.HOME = home
-    process.env.CLAWDBOT_STATE_DIR = stateDir
-    process.env.CLAWDBOT_CONFIG_PATH = configPath
+    process.env.BOT_STATE_DIR = stateDir
+    process.env.BOT_CONFIG_PATH = configPath
 
     const config = `{
       agent: { workspace: "${join(base, 'workspace-main')}" },
@@ -131,7 +131,7 @@ describe('resolveClawdbotSkillRoots', () => {
     await mkdir(join(base, 'config'), { recursive: true })
     await writeFile(configPath, config, 'utf8')
 
-    const { roots, labels } = await resolveClawdbotSkillRoots()
+    const { roots, labels } = await resolveBotSkillRoots()
 
     expect(roots).toEqual(
       expect.arrayContaining([
@@ -144,14 +144,14 @@ describe('resolveClawdbotSkillRoots', () => {
   })
 
   it('returns shared skills root when config is missing', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'clawdhub-clawdbot-missing-'))
+    const base = await mkdtemp(join(tmpdir(), 'skills-bot-missing-'))
     const stateDir = join(base, 'state')
-    const configPath = join(base, 'missing', 'clawdbot.json')
+    const configPath = join(base, 'missing', 'bot.json')
 
-    process.env.CLAWDBOT_STATE_DIR = stateDir
-    process.env.CLAWDBOT_CONFIG_PATH = configPath
+    process.env.BOT_STATE_DIR = stateDir
+    process.env.BOT_CONFIG_PATH = configPath
 
-    const { roots, labels } = await resolveClawdbotSkillRoots()
+    const { roots, labels } = await resolveBotSkillRoots()
 
     expect(roots).toEqual([resolve(stateDir, 'skills')])
     expect(labels[resolve(stateDir, 'skills')]).toBe('Shared skills')

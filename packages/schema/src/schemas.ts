@@ -256,22 +256,22 @@ export const NixPluginSpecSchema = type({
 })
 export type NixPluginSpec = (typeof NixPluginSpecSchema)[inferred]
 
-export const ClawdbotConfigSpecSchema = type({
+export const BotConfigSpecSchema = type({
   requiredEnv: 'string[]?',
   stateDirs: 'string[]?',
   example: 'string?',
 })
-export type ClawdbotConfigSpec = (typeof ClawdbotConfigSpecSchema)[inferred]
+export type BotConfigSpec = (typeof BotConfigSpecSchema)[inferred]
 
-export const ClawdisRequiresSchema = type({
+export const BotRequiresSchema = type({
   bins: 'string[]?',
   anyBins: 'string[]?',
   env: 'string[]?',
   config: 'string[]?',
 })
-export type ClawdisRequires = (typeof ClawdisRequiresSchema)[inferred]
+export type BotRequires = (typeof BotRequiresSchema)[inferred]
 
-export const ClawdisSkillMetadataSchema = type({
+export const BotSkillMetadataSchema = type({
   always: 'boolean?',
   skillKey: 'string?',
   primaryEnv: 'string?',
@@ -279,9 +279,9 @@ export const ClawdisSkillMetadataSchema = type({
   homepage: 'string?',
   os: 'string[]?',
   cliHelp: 'string?',
-  requires: ClawdisRequiresSchema.optional(),
+  requires: BotRequiresSchema.optional(),
   install: SkillInstallSpecSchema.array().optional(),
   nix: NixPluginSpecSchema.optional(),
-  config: ClawdbotConfigSpecSchema.optional(),
+  config: BotConfigSpecSchema.optional(),
 })
-export type ClawdisSkillMetadata = (typeof ClawdisSkillMetadataSchema)[inferred]
+export type BotSkillMetadata = (typeof BotSkillMetadataSchema)[inferred]

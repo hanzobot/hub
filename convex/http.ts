@@ -1,4 +1,4 @@
-import { ApiRoutes, LegacyApiRoutes } from 'clawdhub-schema'
+import { ApiRoutes, LegacyApiRoutes } from 'skills-schema'
 import { httpRouter } from 'convex/server'
 import { auth } from './auth'
 import { downloadZip } from './downloads'

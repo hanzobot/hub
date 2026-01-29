@@ -1,18 +1,18 @@
 ---
-summary: "ClawdHub spec: skills registry, versioning, vector search, moderation"
+summary: "Skills spec: skills registry, versioning, vector search, moderation"
 read_when:
-  - Bootstrapping ClawdHub
+  - Bootstrapping Skills
   - Implementing schema/auth/search/versioning
   - Reviewing API and upload/download flows
 ---
 
-# ClawdHub — product + implementation spec (v1)
+# Skills — product + implementation spec (v1)
 
 ## Goals
 - onlycrabs.ai mode for sharing `SOUL.md` bundles (host-based entry point).
 - Minimal, fast SPA for browsing and publishing agent skills.
 - Skills stored in Convex (files + metadata + versions + stats).
-- GitHub OAuth login; GitHub App backs up skills to `clawdbot/skills`.
+- GitHub OAuth login; GitHub App backs up skills to `bot/skills`.
 - Vector-based search over skill text + metadata.
 - Versioning, tags (`latest` + user tags), changelog, rollback (tag movement).
 - Public read access; upload requires auth.
@@ -58,12 +58,12 @@ read_when:
 - `softDeletedAt` (nullable)
 
 ### Parsed Skill Metadata
-From SKILL.md frontmatter + AgentSkills + Clawdis extensions:
+From SKILL.md frontmatter + AgentSkills + Bot extensions:
 - `name`, `description`, `homepage`, `website`, `url`, `emoji`
-- `metadata.clawdis`: `always`, `skillKey`, `primaryEnv`, `emoji`, `homepage`, `os`,
+- `metadata.botis`: `always`, `skillKey`, `primaryEnv`, `emoji`, `homepage`, `os`,
   `requires` (`bins`, `anyBins`, `env`, `config`), `install[]`, `nix` (`plugin`, `systems`),
   `config` (`requiredEnv`, `stateDirs`, `example`), `cliHelp` (string; `cli --help` output)
-- `metadata.clawdbot`: alias of `metadata.clawdis` (preferred for nix-clawdbot plugin pointers)
+- `metadata.bot`: alias of `metadata.botis` (preferred for nix-bot plugin pointers)
   - Nix plugins are different from regular skills; they bundle the skill pack, the CLI binary, and config flags/requirements together.
   - `metadata` in frontmatter is YAML (object) preferred; legacy JSON-string accepted.
 

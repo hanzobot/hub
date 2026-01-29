@@ -5,7 +5,7 @@ import {
   getFrontmatterValue,
   hashSkillFiles,
   isTextFile,
-  parseClawdisMetadata,
+  parseBotMetadata,
   parseFrontmatter,
   sanitizePath,
 } from './skills'
@@ -51,89 +51,89 @@ describe('skills utils', () => {
     expect(getFrontmatterValue(frontmatter, 'count')).toBeUndefined()
   })
 
-  it('parses clawdis metadata', () => {
+  it('parses botis metadata', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: {"clawdis":{"requires":{"bins":["rg"]},"emoji":"🦞"}}\n---\nBody`,
+      `---\nmetadata: {"botis":{"requires":{"bins":["rg"]},"emoji":"🦞"}}\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.emoji).toBe('🦞')
-    expect(clawdis?.requires?.bins).toEqual(['rg'])
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.emoji).toBe('🦞')
+    expect(botis?.requires?.bins).toEqual(['rg'])
   })
 
-  it('ignores invalid clawdis metadata', () => {
+  it('ignores invalid botis metadata', () => {
     const frontmatter = parseFrontmatter(`---\nmetadata: not-json\n---\nBody`)
-    expect(parseClawdisMetadata(frontmatter)).toBeUndefined()
+    expect(parseBotMetadata(frontmatter)).toBeUndefined()
   })
 
   it('accepts metadata as YAML object (no JSON string)', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata:\n  clawdis:\n    emoji: "🦞"\n    requires:\n      bins:\n        - rg\n---\nBody`,
+      `---\nmetadata:\n  botis:\n    emoji: "🦞"\n    requires:\n      bins:\n        - rg\n---\nBody`,
     )
     expect(getFrontmatterMetadata(frontmatter)).toEqual({
-      clawdis: { emoji: '🦞', requires: { bins: ['rg'] } },
+      botis: { emoji: '🦞', requires: { bins: ['rg'] } },
     })
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.emoji).toBe('🦞')
-    expect(clawdis?.requires?.bins).toEqual(['rg'])
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.emoji).toBe('🦞')
+    expect(botis?.requires?.bins).toEqual(['rg'])
   })
 
-  it('accepts clawdis as top-level YAML key', () => {
+  it('accepts botis as top-level YAML key', () => {
     const frontmatter = parseFrontmatter(
-      `---\nclawdis:\n  emoji: "🦞"\n  requires:\n    anyBins: [rg, fd]\n---\nBody`,
+      `---\nbotis:\n  emoji: "🦞"\n  requires:\n    anyBins: [rg, fd]\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.emoji).toBe('🦞')
-    expect(clawdis?.requires?.anyBins).toEqual(['rg', 'fd'])
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.emoji).toBe('🦞')
+    expect(botis?.requires?.anyBins).toEqual(['rg', 'fd'])
   })
 
   it('accepts legacy metadata JSON string (quoted)', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: '{"clawdis":{"emoji":"🦞","requires":{"bins":["rg"]}}}'\n---\nBody`,
+      `---\nmetadata: '{"botis":{"emoji":"🦞","requires":{"bins":["rg"]}}}'\n---\nBody`,
     )
     const metadata = getFrontmatterMetadata(frontmatter)
-    expect(metadata).toEqual({ clawdis: { emoji: '🦞', requires: { bins: ['rg'] } } })
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.emoji).toBe('🦞')
-    expect(clawdis?.requires?.bins).toEqual(['rg'])
+    expect(metadata).toEqual({ botis: { emoji: '🦞', requires: { bins: ['rg'] } } })
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.emoji).toBe('🦞')
+    expect(botis?.requires?.bins).toEqual(['rg'])
   })
 
-  it('parses clawdis install specs and os', () => {
+  it('parses botis install specs and os', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: {"clawdis":{"install":[{"kind":"brew","formula":"rg"},{"kind":"nope"},{"kind":"node","package":"x"}],"os":"macos,linux","requires":{"anyBins":["rg","fd"]}}}\n---\nBody`,
+      `---\nmetadata: {"botis":{"install":[{"kind":"brew","formula":"rg"},{"kind":"nope"},{"kind":"node","package":"x"}],"os":"macos,linux","requires":{"anyBins":["rg","fd"]}}}\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.install?.map((entry) => entry.kind)).toEqual(['brew', 'node'])
-    expect(clawdis?.os).toEqual(['macos', 'linux'])
-    expect(clawdis?.requires?.anyBins).toEqual(['rg', 'fd'])
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.install?.map((entry) => entry.kind)).toEqual(['brew', 'node'])
+    expect(botis?.os).toEqual(['macos', 'linux'])
+    expect(botis?.requires?.anyBins).toEqual(['rg', 'fd'])
   })
 
-  it('parses clawdbot metadata with nix plugin pointer', () => {
+  it('parses bot metadata with nix plugin pointer', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: {"clawdbot":{"nix":{"plugin":"github:clawdbot/nix-steipete-tools?dir=tools/peekaboo","systems":["aarch64-darwin"]}}}\n---\nBody`,
+      `---\nmetadata: {"bot":{"nix":{"plugin":"github:bot/nix-steipete-tools?dir=tools/peekaboo","systems":["aarch64-darwin"]}}}\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.nix?.plugin).toBe('github:clawdbot/nix-steipete-tools?dir=tools/peekaboo')
-    expect(clawdis?.nix?.systems).toEqual(['aarch64-darwin'])
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.nix?.plugin).toBe('github:bot/nix-steipete-tools?dir=tools/peekaboo')
+    expect(botis?.nix?.systems).toEqual(['aarch64-darwin'])
   })
 
-  it('parses clawdbot config requirements with example', () => {
+  it('parses bot config requirements with example', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: {"clawdbot":{"config":{"requiredEnv":["PADEL_AUTH_FILE"],"stateDirs":[".config/padel"],"example":"config = { env = { PADEL_AUTH_FILE = \\"/run/agenix/padel-auth\\"; }; };"}}}\n---\nBody`,
+      `---\nmetadata: {"bot":{"config":{"requiredEnv":["PADEL_AUTH_FILE"],"stateDirs":[".config/padel"],"example":"config = { env = { PADEL_AUTH_FILE = \\"/run/agenix/padel-auth\\"; }; };"}}}\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.config?.requiredEnv).toEqual(['PADEL_AUTH_FILE'])
-    expect(clawdis?.config?.stateDirs).toEqual(['.config/padel'])
-    expect(clawdis?.config?.example).toBe(
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.config?.requiredEnv).toEqual(['PADEL_AUTH_FILE'])
+    expect(botis?.config?.stateDirs).toEqual(['.config/padel'])
+    expect(botis?.config?.example).toBe(
       'config = { env = { PADEL_AUTH_FILE = "/run/agenix/padel-auth"; }; };',
     )
   })
 
   it('parses cli help output', () => {
     const frontmatter = parseFrontmatter(
-      `---\nmetadata: {"clawdbot":{"cliHelp":"padel --help\\nUsage: padel [command]\\n"}}\n---\nBody`,
+      `---\nmetadata: {"bot":{"cliHelp":"padel --help\\nUsage: padel [command]\\n"}}\n---\nBody`,
     )
-    const clawdis = parseClawdisMetadata(frontmatter)
-    expect(clawdis?.cliHelp).toBe('padel --help\nUsage: padel [command]')
+    const botis = parseBotMetadata(frontmatter)
+    expect(botis?.cliHelp).toBe('padel --help\nUsage: padel [command]')
   })
 
   it('sanitizes file paths', () => {

@@ -622,7 +622,7 @@ export const insertVersion = internalMutation({
     parsed: v.object({
       frontmatter: v.record(v.string(), v.any()),
       metadata: v.optional(v.any()),
-      clawdis: v.optional(v.any()),
+      botis: v.optional(v.any()),
     }),
     embedding: v.array(v.number()),
   },

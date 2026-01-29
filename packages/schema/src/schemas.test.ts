@@ -10,7 +10,7 @@ import {
   WellKnownConfigSchema,
 } from './schemas'
 
-describe('clawdhub-schema', () => {
+describe('skills-schema', () => {
   it('parses lockfile records', () => {
     const lock = parseArk(
       LockfileSchema,
@@ -68,10 +68,10 @@ describe('clawdhub-schema', () => {
     expect(
       parseArk(
         WellKnownConfigSchema,
-        { registry: 'https://example.convex.site', authBase: 'https://clawdhub.com' },
+        { registry: 'https://example.convex.site', authBase: 'https://skills.com' },
         'WellKnown',
       ),
-    ).toEqual({ registry: 'https://example.convex.site', authBase: 'https://clawdhub.com' })
+    ).toEqual({ registry: 'https://example.convex.site', authBase: 'https://skills.com' })
 
     expect(
       parseArk(
@@ -84,14 +84,14 @@ describe('clawdhub-schema', () => {
     const combined = parseArk(
       WellKnownConfigSchema,
       {
-        apiBase: 'https://clawdhub.com',
-        registry: 'https://clawdhub.com',
-        authBase: 'https://clawdhub.com',
+        apiBase: 'https://skills.com',
+        registry: 'https://skills.com',
+        authBase: 'https://skills.com',
       },
       'WellKnown',
     ) as unknown as Record<string, unknown>
-    expect(combined.apiBase).toBe('https://clawdhub.com')
-    expect(combined.registry).toBe('https://clawdhub.com')
+    expect(combined.apiBase).toBe('https://skills.com')
+    expect(combined.registry).toBe('https://skills.com')
   })
 
   it('throws labeled errors', () => {

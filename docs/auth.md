@@ -23,7 +23,7 @@ The CLI uses a long-lived API token (Bearer token) for publish/sync/delete.
 
 ### Browser flow (default)
 
-`clawdhub login` does:
+`skills login` does:
 
 1. Starts a loopback HTTP server on `127.0.0.1` (random port).
 2. Opens `<site>/cli/auth?redirect_uri=http://127.0.0.1:<port>/callback&state=...`.
@@ -35,18 +35,18 @@ The CLI uses a long-lived API token (Bearer token) for publish/sync/delete.
 Create a token in the web UI (Settings → API tokens) and paste it:
 
 ```bash
-clawdhub login --token clh_...
+skills login --token clh_...
 ```
 
 ### Token storage
 
 Default global config path:
 
-- macOS: `~/Library/Application Support/clawdhub/config.json`
+- macOS: `~/Library/Application Support/skills/config.json`
 
 Override:
 
-- `CLAWDHUB_CONFIG_PATH=/path/to/config.json`
+- `SKILLS_CONFIG_PATH=/path/to/config.json`
 
 ### Revocation
 

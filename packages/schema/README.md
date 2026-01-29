@@ -1,3 +1,3 @@
-# clawdhub-schema
+# skills-schema
 
-Shared runtime schemas (ArkType) for ClawdHub.
+Shared runtime schemas (ArkType) for Skills.

@@ -100,7 +100,7 @@ export const applySkillBackfillPatchInternal = internalMutation({
       v.object({
         frontmatter: v.record(v.string(), v.any()),
         metadata: v.optional(v.any()),
-        clawdis: v.optional(v.any()),
+        botis: v.optional(v.any()),
       }),
     ),
   },

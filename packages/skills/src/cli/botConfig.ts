@@ -3,7 +3,7 @@ import { homedir } from 'node:os'
 import { basename, join, resolve } from 'node:path'
 import JSON5 from 'json5'
 
-type ClawdbotConfig = {
+type BotConfig = {
   agent?: { workspace?: string }
   agents?: {
     defaults?: { workspace?: string }
@@ -30,20 +30,20 @@ type ClawdbotConfig = {
   }
 }
 
-export type ClawdbotSkillRoots = {
+export type BotSkillRoots = {
   roots: string[]
   labels: Record<string, string>
 }
 
-export async function resolveClawdbotSkillRoots(): Promise<ClawdbotSkillRoots> {
+export async function resolveBotSkillRoots(): Promise<BotSkillRoots> {
   const roots: string[] = []
   const labels: Record<string, string> = {}
 
-  const stateDir = resolveClawdbotStateDir()
+  const stateDir = resolveBotStateDir()
   const sharedSkills = resolveUserPath(join(stateDir, 'skills'))
   pushRoot(roots, labels, sharedSkills, 'Shared skills')
 
-  const config = await readClawdbotConfig()
+  const config = await readBotConfig()
   if (!config) return { roots, labels }
 
   const mainWorkspace = resolveUserPath(
@@ -80,8 +80,8 @@ export async function resolveClawdbotSkillRoots(): Promise<ClawdbotSkillRoots> {
   return { roots, labels }
 }
 
-export async function resolveClawdbotDefaultWorkspace(): Promise<string | null> {
-  const config = await readClawdbotConfig()
+export async function resolveBotDefaultWorkspace(): Promise<string | null> {
+  const config = await readBotConfig()
   if (!config) return null
 
   const defaultsWorkspace = resolveUserPath(
@@ -96,16 +96,16 @@ export async function resolveClawdbotDefaultWorkspace(): Promise<string | null> 
   return listWorkspace || null
 }
 
-function resolveClawdbotStateDir() {
-  const override = process.env.CLAWDBOT_STATE_DIR?.trim()
+function resolveBotStateDir() {
+  const override = process.env.BOT_STATE_DIR?.trim()
   if (override) return resolveUserPath(override)
-  return join(homedir(), '.clawdbot')
+  return join(homedir(), '.bot')
 }
 
-function resolveClawdbotConfigPath() {
-  const override = process.env.CLAWDBOT_CONFIG_PATH?.trim()
+function resolveBotConfigPath() {
+  const override = process.env.BOT_CONFIG_PATH?.trim()
   if (override) return resolveUserPath(override)
-  return join(resolveClawdbotStateDir(), 'clawdbot.json')
+  return join(resolveBotStateDir(), 'bot.json')
 }
 
 function resolveUserPath(input: string) {
@@ -117,12 +117,12 @@ function resolveUserPath(input: string) {
   return resolve(trimmed)
 }
 
-async function readClawdbotConfig(): Promise<ClawdbotConfig | null> {
+async function readBotConfig(): Promise<BotConfig | null> {
   try {
-    const raw = await readFile(resolveClawdbotConfigPath(), 'utf8')
+    const raw = await readFile(resolveBotConfigPath(), 'utf8')
     const parsed = JSON5.parse(raw)
     if (!parsed || typeof parsed !== 'object') return null
-    return parsed as ClawdbotConfig
+    return parsed as BotConfig
   } catch {
     return null
   }
